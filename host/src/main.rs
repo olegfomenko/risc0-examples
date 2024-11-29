@@ -8,6 +8,7 @@ use k256::{AffinePoint, Scalar};
 use k256::elliptic_curve::Group;
 use k256::elliptic_curve::group::Curve;
 use rand_core::OsRng;
+use std::time::Instant;
 
 fn main() {
     let mut rand = OsRng::default();
@@ -21,6 +22,9 @@ fn main() {
     // Public data
     let g = k256::ProjectivePoint::random(&mut rand).to_affine();
     let h = k256::ProjectivePoint::random(&mut rand).to_affine();
+
+
+    let now = Instant::now();
 
     // Passing data to environment
     let env = ExecutorEnv::builder()
@@ -43,6 +47,10 @@ fn main() {
 
     let (commitment, g, h): (AffinePoint, AffinePoint, AffinePoint) = receipt.journal.decode().unwrap();
 
+    let elapsed = now.elapsed();
+    println!("Elapsed proving: {:.2?}", elapsed);
+
+
     // The receipt was verified at the end of proving, but the below code is an
     // example of how someone else could verify this receipt.
     receipt
@@ -50,6 +58,9 @@ fn main() {
         .unwrap();
 
     println!("Prove verified!");
+
+    let elapsed = now.elapsed();
+    println!("Elapsed verification: {:.2?}", elapsed);
 
     //println!("Receipt: {}", serde_json::to_string_pretty(&receipt).unwrap());
 
